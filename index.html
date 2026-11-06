@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nice AI — o inglês que não espera a próxima aula</title>
+<meta name="description" content="Nice AI é o app da Nice English School: a IA treina com você todo dia e o professor te leva mais longe.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sites-incriveis.css">
+<style>
+  :root {
+    --preto: #0d0d0e;
+    --superficie: #19191b;
+    --tinta: #f6f2f1;
+    --tinta-suave: #a8a1a2;
+    --vermelho: #af1615;
+    --vermelho-fundo: #9e1313;
+    --claro: #f0f3f5;
+    --acento: #fff500;
+    --f-display: "Sora", system-ui, sans-serif;
+    --f-texto: "DM Sans", system-ui, sans-serif;
+    /* escala: 15 / 18 / 24 / 36 / 56 / 96 — espaço: 8 / 16 / 24 / 40 / 64 / 104 */
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; background: var(--preto); }
+  body {
+    margin: 0; background: var(--preto); color: var(--tinta);
+    font-family: var(--f-texto); font-size: 18px; line-height: 1.55;
+    overflow-x: hidden;
+  }
+  h1, h2, h3 { font-family: var(--f-display); font-weight: 800; line-height: 1.04; letter-spacing: -0.02em; margin: 0 0 24px; }
+  h1 { font-size: clamp(42px, 8vw, 96px); }
+  h2 { font-size: clamp(32px, 5.4vw, 56px); }
+  h3 { font-size: 24px; letter-spacing: -0.01em; }
+  p { margin: 0 0 16px; max-width: 34em; }
+  .rotulo { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tinta-suave); margin-bottom: 24px; display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; }
+
+  .botao {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--acento); color: var(--preto);
+    font-family: var(--f-display); font-weight: 800; font-size: 18px;
+    padding: 18px 32px; border-radius: 999px; text-decoration: none;
+    transition: transform .2s ease;
+  }
+  .botao:hover { transform: translateY(-2px); }
+  .botao.pequeno { font-size: 15px; padding: 10px 24px; }
+
+  /* topo */
+  .topo {
+    position: fixed; inset: 0 0 auto 0; z-index: 50;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 5vw; pointer-events: none;
+  }
+  .topo > * { pointer-events: auto; }
+  .marca { font-family: var(--f-display); font-weight: 800; font-size: 24px; letter-spacing: -0.03em; text-decoration: none; color: #fff; background: var(--preto); padding: 8px 20px; border-radius: 999px; }
+  .marca b { color: var(--acento); font-weight: 800; }
+
+  section { position: relative; }
+  .miolo { padding: 104px 5vw; }
+
+  /* ===== 1. abertura ===== */
+  .abertura {
+    min-height: 92vh; min-height: 92dvh;
+    display: grid; grid-template-columns: 1.15fr .85fr; gap: 40px; align-items: center;
+    padding: 120px 5vw 64px;
+  }
+  .abertura h1 { max-width: 11ch; }
+  .abertura p { color: var(--tinta-suave); font-size: 18px; }
+  .balao-grande {
+    background: var(--vermelho); border-radius: 40px 40px 40px 8px;
+    padding: 40px; transform: rotate(-3deg); min-height: 220px;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
+  }
+  .balao-grande small { font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+  .balao-grande p { font-family: var(--f-display); font-weight: 600; font-size: 24px; line-height: 1.3; margin: 0; max-width: none; color: #fff; min-height: 3.9em; }
+
+  /* ===== 2. problema (fundo vermelho) ===== */
+  .problema .miolo { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; min-height: 100vh; }
+  .problema .numero { font-family: var(--f-display); font-weight: 800; font-size: clamp(120px, 24vw, 320px); line-height: .85; letter-spacing: -0.05em; margin: 0 0 16px; }
+  .problema .legenda { font-size: 24px; font-weight: 500; margin: 0; }
+  .problema p { color: #fff; }
+  .pontos { display: grid; grid-template-columns: repeat(28, 1fr); gap: 4px; margin-top: 40px; max-width: 520px; }
+  .pontos i { aspect-ratio: 1; background: rgba(255,255,255,.28); border-radius: 2px; opacity: 0; transition: opacity .4s ease; }
+  .pontos.fx-em-cena i { opacity: 1; }
+  .pontos i.aula { background: var(--acento); }
+  .pontos i.meia { background: linear-gradient(90deg, var(--acento) 50%, rgba(255,255,255,.28) 50%); }
+  .pontos-legenda { font-size: 15px; margin-top: 16px; color: #fff; }
+  .pontos-legenda span { display: inline-block; width: 12px; height: 12px; background: var(--acento); border-radius: 2px; margin-right: 8px; }
+
+  /* ===== 3. pico ===== */
+  .pico .fx-palco { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; padding: 64px 5vw 40px; }
+  .fases { position: relative; display: grid; }
+  .fase { grid-area: 1 / 1; opacity: 0; transform: translateY(24px); transition: opacity .5s ease, transform .5s ease; pointer-events: none; }
+  .pico[data-fase="1"] .fase:nth-child(1),
+  .pico[data-fase="2"] .fase:nth-child(2),
+  .pico[data-fase="3"] .fase:nth-child(3) { opacity: 1; transform: none; pointer-events: auto; }
+  .fase p { color: var(--tinta-suave); }
+  .fase h2 { margin-bottom: 24px; }
+  .fase:nth-child(2) h2 em { font-style: normal; background: var(--acento); color: var(--preto); padding: 0 .15em; border-radius: 8px; }
+
+  .telefone {
+    background: var(--superficie); border: 1px solid #2c2c30; border-radius: 40px;
+    padding: 24px; height: min(640px, 78vh); display: flex; flex-direction: column; max-width: 460px; width: 100%; justify-self: center;
+  }
+  .telefone header { display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: var(--tinta-suave); padding-bottom: 16px; border-bottom: 1px solid #2c2c30; }
+  .espera { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--tinta); }
+  .conversa { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; padding-top: 16px; overflow: hidden; }
+  .msg { display: none; max-width: 86%; padding: 12px 16px; border-radius: 20px; font-size: 15px; line-height: 1.4; }
+  .msg.on { display: block; animation: entra .35s ease both; }
+  @keyframes entra { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .msg.aluno { align-self: flex-end; background: #2a2a2e; border-bottom-right-radius: 6px; }
+  .msg.ia { align-self: flex-start; background: var(--vermelho); border-bottom-left-radius: 6px; }
+  .msg.prof { align-self: stretch; max-width: 100%; background: var(--claro); color: var(--preto); border-radius: 20px; }
+  .msg.prof b { font-size: 15px; letter-spacing: .06em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+  .msg.aviso { align-self: center; max-width: 100%; background: none; border: 1px dashed #55555b; color: var(--tinta-suave); text-align: center; border-radius: 999px; }
+  .msg.aviso.vivo { border: 1px solid var(--acento); color: var(--acento); }
+  .microfone { margin-top: 16px; display: flex; align-items: center; gap: 12px; font-size: 15px; color: var(--tinta-suave); }
+  .microfone i { width: 12px; height: 12px; border-radius: 50%; background: #55555b; }
+  .pico[data-fase="2"] .microfone i, .pico[data-fase="3"] .microfone i { background: var(--acento); animation: pulsa 1.2s ease-in-out infinite; }
+  @keyframes pulsa { 50% { transform: scale(1.5); opacity: .6; } }
+  .nota-exemplo { font-size: 15px; color: var(--tinta-suave); margin: 16px 0 0; text-align: center; max-width: none; }
+
+  /* ===== 4. método (fundo claro, trilho) ===== */
+  .metodo .fx-palco { flex-direction: column; align-items: flex-start; justify-content: center; gap: 40px; }
+  .metodo [data-fx="trilho"] { width: 100%; align-self: stretch; }
+  .metodo .cabeca { padding: 0 5vw; }
+  .metodo .cabeca h2 { margin: 0; max-width: 16ch; }
+  .metodo .cabeca .rotulo { color: inherit; opacity: .7; }
+  .cartao { flex: 0 0 min(80vw, 460px); margin-right: 24px; background: #fff; color: var(--preto); border-radius: 32px; padding: 40px; min-height: 340px; display: flex; flex-direction: column; justify-content: space-between; }
+  .cartao:first-child { margin-left: 5vw; }
+  .cartao:last-child { margin-right: 5vw; }
+  .cartao .papel { font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--vermelho); }
+  .cartao p { color: #3d383a; margin: 0; }
+  .cartao.destaque { background: var(--vermelho); color: #fff; }
+  .cartao.destaque .papel { color: var(--acento); }
+  .cartao.destaque p { color: #fff; }
+
+  /* ===== 5. como começar ===== */
+  .comecar .miolo { display: grid; grid-template-columns: .8fr 1.2fr; gap: 64px; }
+  .passos { list-style: none; margin: 0; padding: 0; display: grid; gap: 40px; }
+  .passos li { display: grid; grid-template-columns: 72px 1fr; gap: 24px; align-items: start; border-top: 1px solid #2c2c30; padding-top: 24px; }
+  .passos .n { font-family: var(--f-display); font-weight: 800; font-size: 56px; line-height: 1; color: var(--acento); }
+  .passos h3 { margin-bottom: 8px; }
+  .passos p { color: var(--tinta-suave); margin: 0; }
+  .faixa { display: flex; gap: 40px; flex-wrap: wrap; margin-top: 40px; }
+  .faixa strong { font-family: var(--f-display); font-size: 36px; display: block; line-height: 1.1; }
+  .faixa span { font-size: 15px; color: var(--tinta-suave); }
+
+  /* ===== 6. fechamento ===== */
+  .fecho .miolo { min-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+  .fecho h2 { max-width: 16ch; font-size: clamp(36px, 6.4vw, 72px); margin-bottom: 40px; }
+  .fecho h2 span { color: var(--tinta-suave); }
+  .fecho small { display: block; margin-top: 24px; font-size: 15px; color: var(--tinta-suave); }
+  footer { padding: 24px 5vw 40px; font-size: 15px; color: var(--tinta-suave); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-top: 1px solid #2c2c30; }
+
+  /* ===== celular ===== */
+  @media (max-width: 820px) {
+    body { font-size: 17px; }
+    .abertura { grid-template-columns: 1fr; padding-top: 104px; gap: 40px; }
+    .balao-grande { padding: 24px; min-height: 0; }
+    .balao-grande p { font-size: 18px; }
+    .miolo { padding: 64px 5vw; }
+    .problema .miolo, .comecar .miolo { grid-template-columns: 1fr; gap: 40px; min-height: 0; }
+    .pontos { grid-template-columns: repeat(21, 1fr); }
+    .pico .fx-palco { grid-template-columns: 1fr; grid-template-rows: auto 1fr; gap: 16px; padding: 72px 5vw 16px; align-items: start; }
+    .fase h2 { font-size: 28px; margin-bottom: 8px; }
+    .fase p { font-size: 15px; margin: 0; }
+    .telefone { height: 100%; min-height: 0; padding: 16px; border-radius: 28px; max-width: none; }
+    .nota-exemplo { display: none; }
+    .cartao { padding: 24px; min-height: 300px; }
+    .passos li { grid-template-columns: 48px 1fr; }
+    .passos .n { font-size: 40px; }
+  }
+
+  /* ===== movimento reduzido: tudo legível, parado ===== */
+  .fx-reduzido .fx-palco { height: auto; }
+  .fx-reduzido .pico .fx-palco { padding: 64px 5vw; }
+  .fx-reduzido .fase { grid-area: auto; opacity: 1; transform: none; margin-bottom: 24px; }
+  .fx-reduzido .fases { display: block; }
+  .fx-reduzido .msg { display: block; animation: none; }
+  .fx-reduzido .conversa { justify-content: flex-start; overflow: visible; }
+  .fx-reduzido .telefone { height: auto; }
+  .fx-reduzido .pontos i { opacity: 1; transition: none; }
+  .fx-reduzido .microfone i { animation: none; }
+  .fx-reduzido .metodo .fx-palco { padding: 64px 0; }
+  .fx-reduzido [data-fx="trilho"] { padding: 0 5vw; gap: 24px; }
+  .fx-reduzido .cartao { margin: 0 !important; flex: 1 1 280px; }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <a class="marca" href="#" aria-label="Nice AI">NICE<b> AI</b></a>
+  <a class="botao pequeno" data-app href="https://thiagoxxsena.github.io/nice-ai/">Entrar</a>
+</header>
+
+<main>
+
+<!-- 1 · ABERTURA (calma) -->
+<section class="abertura" data-fx-fundo="#0d0d0e" data-fx-tinta="#f6f2f1">
+  <div>
+    <span class="rotulo">Nice English School · Inglês em todo lugar</span>
+    <h1 data-fx="palavras">Seu inglês não precisa esperar a próxima aula.</h1>
+    <p data-fx="subir" data-fx-atraso="900">Nice AI é o app da Nice English School. A IA treina com você todo dia. O professor te leva mais longe.</p>
+  </div>
+  <div data-fx-mouse="14">
+    <div class="balao-grande" data-fx="crescer" data-fx-atraso="400">
+      <small>Nice AI</small>
+      <p data-fx="digitar">Hello! Ready to practice some English today?</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · O PROBLEMA (média) -->
+<section class="problema" data-fx-fundo="#9e1313" data-fx-tinta="#ffffff">
+  <div class="miolo">
+    <div>
+      <p class="numero"><span data-fx="contar" data-fx-fim="168">0</span></p>
+      <p class="legenda" data-fx="subir">horas em uma semana.</p>
+      <div class="pontos" id="pontos" data-fx="surgir" aria-hidden="true"></div>
+      <p class="pontos-legenda" data-fx="surgir"><span></span>Até 2,5 h de aula ao vivo, em um plano de 5 aulas de 30 minutos por semana.</p>
+    </div>
+    <div>
+      <span class="rotulo" style="color:#fff;opacity:.8">O limite</span>
+      <h2 data-fx="subir">O resto da semana, o inglês fica parado.</h2>
+      <p data-fx="subir" data-fx-atraso="150">Aula com professor tem dia, hora e vaga. Um professor só pode estar em uma conversa por vez.</p>
+      <p data-fx="subir" data-fx-atraso="300">Quem quer falar mais precisa esperar. E esperar é o que faz o aluno desistir.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · O APP — PICO + movimento-assinatura "A conversa que cresce" -->
+<section class="pico" id="pico" data-fx-fixa data-fx-altura="5" data-fase="1" data-fx-fundo="#0d0d0e" data-fx-tinta="#f6f2f1">
+  <div class="fx-palco">
+    <div class="fases">
+      <div class="fase">
+        <span class="rotulo">Aula marcada</span>
+        <h2>Aula marcada tem hora para acabar.</h2>
+        <p>Você tem vontade de falar agora, mas a próxima vaga é só daqui a alguns dias.</p>
+      </div>
+      <div class="fase">
+        <span class="rotulo">Nice AI</span>
+        <h2>Com o Nice AI, a conversa <em>não espera.</em></h2>
+        <p>Fale, ouça e seja corrigido na hora, pelo microfone, no seu ritmo. Quando você quiser, onde estiver.</p>
+      </div>
+      <div class="fase">
+        <span class="rotulo">Seu professor</span>
+        <h2>E o professor te leva mais longe.</h2>
+        <p>Ele acompanha o que você praticou, corrige o que a IA não percebe e define o próximo passo.</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="telefone" role="img" aria-label="Exemplo de conversa de inglês no Nice AI">
+        <header><span>Conversa de inglês</span><span class="espera" id="espera">Aguardando: 0 dias</span></header>
+        <div class="conversa" id="conversa">
+          <div class="msg aluno" data-t="0.03">I want to practice for my job interview.</div>
+          <div class="msg aviso" data-t="0.12">Próxima vaga com professor: quinta, 19h</div>
+          <div class="msg aviso vivo" data-t="0.31">Nice AI entrou. Sem fila.</div>
+          <div class="msg ia" data-t="0.34">Great! Tell me about the position you want.</div>
+          <div class="msg aluno" data-t="0.42">I want to work as a project manager.</div>
+          <div class="msg ia" data-t="0.50">Nice! Why are you a good fit? Try a full sentence.</div>
+          <div class="msg aluno" data-t="0.58">I have experience lead teams.</div>
+          <div class="msg ia" data-t="0.66">Almost! Try "leading teams". Say it again?</div>
+          <div class="msg aluno" data-t="0.73">I have experience leading teams.</div>
+          <div class="msg ia" data-t="0.79">Perfect!</div>
+          <div class="msg prof" data-t="0.88"><b>Seu professor</b>Ótima evolução! Na entrevista, para conquistas passadas, use "I led a team of…". Próximo desafio liberado.</div>
+        </div>
+        <div class="microfone"><i></i><span id="mic">Microfone desligado</span></div>
+      </div>
+      <p class="nota-exemplo">Exemplo ilustrativo de conversa.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · O MÉTODO (média, fundo claro, trilho) -->
+<section class="metodo" data-fx-fundo="#f0f3f5" data-fx-tinta="#0d0d0e" data-fx-fixa data-fx-altura="3">
+  <div class="fx-palco">
+    <div class="cabeca">
+      <span class="rotulo">Como funciona</span>
+      <h2>Três pontas, um mesmo aluno.</h2>
+    </div>
+    <div data-fx="trilho">
+      <article class="cartao destaque">
+        <span class="papel">A IA · todo dia</span>
+        <h3>Treino de 15 minutos por dia, por voz.</h3>
+        <p>Mais de 50 tópicos de conversação, no horário que couber na sua rotina.</p>
+      </article>
+      <article class="cartao">
+        <span class="papel">O professor · mais longe</span>
+        <h3>Quem corrige, orienta e muda o nível.</h3>
+        <p>Acompanha sua evolução e conduz você ao próximo passo, em aulas ao vivo que ficam gravadas.</p>
+      </article>
+      <article class="cartao">
+        <span class="papel">A escola · visão do dono</span>
+        <h3>Gestão com a prática à vista.</h3>
+        <p>A escola acompanha o uso e a evolução dos alunos em um só lugar.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · COMO COMEÇAR (média-baixa) -->
+<section class="comecar" data-fx-fundo="#0d0d0e" data-fx-tinta="#f6f2f1">
+  <div class="miolo">
+    <div>
+      <span class="rotulo">Como começar</span>
+      <h2 data-fx="subir">Três passos. Sem prova de nivelamento escrita.</h2>
+      <!-- PLACEHOLDER: valores fictícios, edite no objeto DADOS no final deste arquivo -->
+      <div class="faixa" data-fx="surgir">
+        <div><strong><span data-fx="contar" data-fx-fim="500" data-dado="alunos">0</span></strong><span>alunos praticando <em>(exemplo)</em></span></div>
+        <div><strong><span data-fx="contar" data-fx-fim="10000" data-dado="conversas">0</span></strong><span>conversas por mês <em>(exemplo)</em></span></div>
+      </div>
+    </div>
+    <ol class="passos">
+      <li data-fx="direita"><span class="n">1</span><div><h3>Entre com sua conta Google.</h3><p>Um toque, sem formulário longo.</p></div></li>
+      <li data-fx="direita" data-fx-atraso="150"><span class="n">2</span><div><h3>Converse com a IA.</h3><p>Ela descobre seu nível falando com você, não com uma prova escrita.</p></div></li>
+      <li data-fx="direita" data-fx-atraso="300"><span class="n">3</span><div><h3>Treine 15 minutos por dia.</h3><p>Seu professor acompanha e te leva ao próximo nível.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- 6 · FECHAMENTO (calma) -->
+<section class="fecho">
+  <div class="miolo">
+    <h2 data-fx="subir">A IA treina comigo todo dia. <span>O professor me leva mais longe.</span></h2>
+    <a class="botao" data-app data-fx="surgir" data-fx-atraso="200" href="https://thiagoxxsena.github.io/nice-ai/">Entrar com o Google</a>
+    <small>App gratuito com IA para alunos da Nice English School.</small>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span>Nice English School · Taubaté</span>
+  <span>Inglês em todo lugar · @be.niceschool</span>
+</footer>
+
+<script src="sites-incriveis.js" defer></script>
+<script>
+(function () {
+  /* ===== CONFIGURAÇÃO EDITÁVEL ===== */
+  var APP_URL = "https://thiagoxxsena.github.io/nice-ai/"; // troque pelo endereço do app (ex.: https://app.niceschool.com.br)
+  var DADOS = {            // PLACEHOLDER: números fictícios de exemplo. Troque pelos reais.
+    alunos: 500,
+    conversas: 10000
+  };
+  /* ================================= */
+
+  document.querySelectorAll("[data-app]").forEach(function (a) { a.href = APP_URL; });
+  document.querySelectorAll("[data-dado]").forEach(function (el) {
+    var v = DADOS[el.getAttribute("data-dado")];
+    if (v != null) el.setAttribute("data-fx-fim", v);
+  });
+
+  // pontos: 168 horas; 2,5 destacadas
+  var pontos = document.getElementById("pontos");
+  for (var i = 0; i < 168; i++) {
+    var p = document.createElement("i");
+    if (i < 2) p.className = "aula"; else if (i === 2) p.className = "meia";
+    p.style.transitionDelay = (i * 6) + "ms";
+    pontos.appendChild(p);
+  }
+
+  // ===== movimento-assinatura: "A conversa que cresce" =====
+  var secao = document.getElementById("pico");
+  var msgs = [].slice.call(secao.querySelectorAll(".msg"));
+  var espera = document.getElementById("espera");
+  var mic = document.getElementById("mic");
+  var reduzido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var ultimo = -1;
+
+  function atualiza() {
+    var prog = parseFloat(getComputedStyle(secao).getPropertyValue("--progresso")) || 0;
+    var fase = prog < 0.30 ? 1 : prog < 0.82 ? 2 : 3;
+    if (secao.getAttribute("data-fase") !== String(fase)) secao.setAttribute("data-fase", fase);
+    msgs.forEach(function (m) {
+      m.classList.toggle("on", prog >= parseFloat(m.getAttribute("data-t")));
+    });
+    if (fase === 1) {
+      espera.textContent = "Aguardando: " + Math.min(3, Math.floor(prog / 0.3 * 4)) + " dias";
+      mic.textContent = "Microfone desligado";
+    } else {
+      espera.textContent = "Espera: 0 min";
+      mic.textContent = "Microfone ligado · fale quando quiser";
+    }
+  }
+  if (!reduzido) {
+    window.addEventListener("scroll", function () { requestAnimationFrame(atualiza); }, { passive: true });
+    window.addEventListener("resize", atualiza);
+    window.addEventListener("load", atualiza);
+  } else {
+    espera.textContent = "Exemplo de conversa";
+    mic.textContent = "Fale pelo microfone, quando quiser";
+  }
+})();
+</script>
+</body>
+</html>
